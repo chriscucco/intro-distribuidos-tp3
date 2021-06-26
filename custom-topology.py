@@ -3,7 +3,8 @@ import sys
 
 class CustomTopo(Topo):
     def build(self):
+        print('AAAAAAAAAAAAAAAA')
         print(sys.argv)
         return
 
-topos = { 'custom': (lambda: CustomTopo())}
+topos = { 'custom': (lambda x,y: CustomTopo())}

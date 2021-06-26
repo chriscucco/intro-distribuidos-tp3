@@ -1,6 +1,5 @@
 from mininet.topo import Topo
 import math
-import sys
 
 class CustomTopo(Topo):
     def build(self, levels, hosts):

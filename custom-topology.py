@@ -32,13 +32,24 @@ class CustomTopo(Topo):
         print('Hosts size: '+str(len(hosts)))
         print('Switches size: '+str(len(switches)))
         
+        print('Connecting hosts to switches')
         for index, host in enumerate(hosts):
             pos = 0
             if (index % 2 > 0):
                 pos = -1
             currentSwitch = switches[pos]
             self.addLink(host, currentSwitch)
-            print('Connecting host to switch')
+        
+        print('Connecting Switches')
+        ## If level = 1, only there is 1 switch and there is no need to
+        ## create connections between switches
+        i = 2
+        while i <= numOfLevels:
+            takenSwitchs = math.pow(2, i-2)
+            initialMove = takenSwitchs - 0
+            print(takenSwitchs)
+            print(initialMove)
+            i += 1
         print('//////////////////////')
         return
 

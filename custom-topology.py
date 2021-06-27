@@ -79,7 +79,7 @@ class CustomTopo(Topo):
 
             leftSwitches = []
             rightSwitches = []
-
+            index = initialSwitch
             while index > lastLeftSwitch:
                 leftSwitches.append(switches[int(index)])
                 index -= 1

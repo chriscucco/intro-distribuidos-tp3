@@ -27,10 +27,18 @@ class CustomTopo(Topo):
             hosts.append(h)
             numOfHosts -= 1
             i += 1
-
+        
         print('Hosts and switches created')
         print('Hosts size: '+str(len(hosts)))
         print('Switches size: '+str(len(switches)))
+        
+        for index, host in enumerate(hosts):
+            pos = 0
+            if (index % 2 > 0):
+                pos = -1
+            currentSwitch = switches[pos]
+            self.addLink(host, currentSwitch)
+            print('Connecting host to switch')
         print('//////////////////////')
         return
 

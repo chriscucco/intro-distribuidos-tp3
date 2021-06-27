@@ -49,6 +49,7 @@ class CustomTopo(Topo):
             destinySwitches = 2 * takenSwitchs
             initialMove = takenSwitchs - 1
 
+            ## Left branch
             initialSwitch = int(initialMove)
             lastLeftSwitch = int(initialMove + takenSwitchs)
             lastRightSwitch = int(lastLeftSwitch + destinySwitches)
@@ -71,15 +72,27 @@ class CustomTopo(Topo):
                 self.addLink(leftSwitches[leftBranchIndex], rightSwitches[(2*leftBranchIndex)+1])
                 leftBranchIndex += 1
 
-            ## Left branch
-            print('Iteration: ' + str(i))
-            print(len(leftSwitches))
-            print(len(rightSwitches))
-
-
             ## Right branch
-            # print(takenSwitchs)
-            # print(initialMove)
+            initialSwitch = int(-1-initialMove)
+            lastLeftSwitch = int(-1 - initialMove - takenSwitchs)
+            lastRightSwitch = int(lastLeftSwitch - destinySwitches)
+
+            leftSwitches = []
+            rightSwitches = []
+
+            while index > lastLeftSwitch:
+                leftSwitches.append(switches[int(index)])
+                index -= 1
+            
+            while index > lastRightSwitch:
+                rightSwitches.append(switches[int(index)])
+                index -= 1
+            
+            rightBranchIndex = 0
+            while rightBranchIndex < len(leftSwitches):
+                self.addLink(leftSwitches[rightBranchIndex], rightSwitches[(2*rightBranchIndex)])
+                self.addLink(leftSwitches[rightBranchIndex], rightSwitches[(2*rightBranchIndex)+1])
+                rightBranchIndex += 1
             i += 1
         print('//////////////////////')
         return

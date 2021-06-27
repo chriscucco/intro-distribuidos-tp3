@@ -45,24 +45,24 @@ class CustomTopo(Topo):
         ## create connections between switches
         i = 2
         while i <= numOfLevels:
-            takenSwitchs = math.pow(2, i-2)
+            takenSwitchs = int(math.pow(2, i-2))
             destinySwitches = 2 * takenSwitchs
             initialMove = takenSwitchs - 1
 
-            initialSwitch = initialMove
-            lastLeftSwitch = initialMove + takenSwitchs
-            lastRightSwitch = lastLeftSwitch + destinySwitches
+            initialSwitch = int(initialMove)
+            lastLeftSwitch = int(initialMove + takenSwitchs)
+            lastRightSwitch = int(lastLeftSwitch + destinySwitches)
 
             leftSwitches = []
             rightSwitches = []
 
             index = initialSwitch
             while index < lastLeftSwitch:
-                leftSwitches.append(switches[index])
+                leftSwitches.append(switches[int(index)])
                 index += 1
             
             while index < lastRightSwitch:
-                rightSwitches.append(switches[index])
+                rightSwitches.append(switches[int(index)])
                 index += 1
 
             ## Left branch

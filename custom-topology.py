@@ -46,9 +46,19 @@ class CustomTopo(Topo):
         i = 2
         while i <= numOfLevels:
             takenSwitchs = math.pow(2, i-2)
+            destinySwitches = 2 * takenSwitchs
             initialMove = takenSwitchs - 1
-            print(takenSwitchs)
-            print(initialMove)
+            ## Left branch
+            leftSwitches = switches[initialMove:initialMove+takenSwitchs]
+            rightSwitches = switches[initialMove+takenSwitchs:initialMove+takenSwitchs+destinySwitches]
+            print('Iteration: ' + str(i))
+            print(len(leftSwitches))
+            print(len(rightSwitches))
+
+
+            ## Right branch
+            # print(takenSwitchs)
+            # print(initialMove)
             i += 1
         print('//////////////////////')
         return

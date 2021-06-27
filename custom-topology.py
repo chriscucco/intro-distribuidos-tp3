@@ -46,7 +46,7 @@ class CustomTopo(Topo):
         i = 2
         while i <= numOfLevels:
             takenSwitchs = math.pow(2, i-2)
-            initialMove = takenSwitchs - 0
+            initialMove = takenSwitchs - 1
             print(takenSwitchs)
             print(initialMove)
             i += 1

@@ -65,6 +65,12 @@ class CustomTopo(Topo):
                 rightSwitches.append(switches[int(index)])
                 index += 1
 
+            leftBranchIndex = 0
+            while leftBranchIndex < len(leftSwitches):
+                self.addLink(leftSwitches[leftBranchIndex], rightSwitches[(2*leftBranchIndex)])
+                self.addLink(leftSwitches[leftBranchIndex], rightSwitches[(2*leftBranchIndex)+1])
+                leftBranchIndex += 1
+
             ## Left branch
             print('Iteration: ' + str(i))
             print(len(leftSwitches))

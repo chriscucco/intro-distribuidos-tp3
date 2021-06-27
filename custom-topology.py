@@ -1,6 +1,5 @@
 from mininet.topo import Topo
 import math
-import numpy as np
 
 class CustomTopo(Topo):
     def build(self, levels, hostsNum):
@@ -45,14 +44,28 @@ class CustomTopo(Topo):
         ## If level = 1, only there is 1 switch and there is no need to
         ## create connections between switches
         i = 2
-        npSwitches = np.array(switches)
         while i <= numOfLevels:
             takenSwitchs = math.pow(2, i-2)
             destinySwitches = 2 * takenSwitchs
             initialMove = takenSwitchs - 1
+
+            initialSwitch = initialMove
+            lastLeftSwitch = initialMove + takenSwitchs
+            lastRightSwitch = lastLeftSwitch + destinySwitches
+
+            leftSwitches = []
+            rightSwitches = []
+
+            index = initialSwitch
+            while index < lastLeftSwitch:
+                leftSwitches.append(switches[index])
+                index += 1
+            
+            while index < lastRightSwitch:
+                rightSwitches.append(switches[index])
+                index += 1
+
             ## Left branch
-            leftSwitches = npSwitches[initialMove:initialMove+takenSwitchs]
-            rightSwitches = npSwitches[initialMove+takenSwitchs:initialMove+takenSwitchs+destinySwitches]
             print('Iteration: ' + str(i))
             print(len(leftSwitches))
             print(len(rightSwitches))

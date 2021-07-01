@@ -19,7 +19,7 @@ class LinearCustomTopo(Topo):
         while numOfSwitches > 0:
             switchName = 's'+str(i)
             print('Creating switch '+switchName)
-            s = self.addSwitch(switchName, failMode='standalone', stp=True)
+            s = self.addSwitch(switchName)
             switches.append(s)
             numOfSwitches -= 1
             i += 1

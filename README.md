@@ -12,3 +12,7 @@ where custom,x,y => x represent number of levels and y represents number of host
 sudo mn --custom=mininet/custom/linear-topology.py --topo=linearCustom,10 --mac --arp --switch=ovsk --controller=remote
 
 where linearCustom,x => x represent number of switches. Hosts are 4, set by statement
+
+## To not loose messages, must run the following command in mininetVM
+
+pox/pox.py samples.spanning_tree

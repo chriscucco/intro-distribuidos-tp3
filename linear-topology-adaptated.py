@@ -7,7 +7,7 @@ class LinearCustomTopo(Topo):
         numOfSwitches = int(switchesNum)
         switches = []
         print('Creating host h1')
-        h1 = self.addHost('h1', port=4)
+        h1 = self.addHost('h1',port=80)
         print('Creating host h2')
         h2 = self.addHost('h2')
         print('Creating host h3')

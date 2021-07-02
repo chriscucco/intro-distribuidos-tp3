@@ -34,14 +34,14 @@ class Firewall (EventMixin):
         blocked.new_proto = 17
         flow_mod = of.ofp_flow_mod()
         flow_mod.match = blocked
-        event.connection.send(flow_mod)
+        event.connection.send(flow_mod)'''
 
         # Regla 3: descartar paquetes con puerto 80
         blocked = of.ofp_match()
         blocked.tp_dst = 80
         flow_mod = of.ofp_flow_mod()
         flow_mod.match = blocked
-        event.connection.send(flow_mod)'''
+        event.connection.send(flow_mod)
 
         '''
         packet = event.parsed

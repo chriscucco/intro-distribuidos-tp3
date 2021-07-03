@@ -15,4 +15,4 @@ where linearCustom,x => x represent number of switches. Hosts are 4, set by stat
 
 ## To not loose messages, must run the following command in mininetVM
 
-pox/pox.py samples.spanning_tree
+sudo pox/pox.py samples.spanning_tree forwarding.l2_learning

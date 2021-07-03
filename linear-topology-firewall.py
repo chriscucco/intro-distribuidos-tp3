@@ -16,7 +16,7 @@ HOST_3 = '00:00:00:00:00:03'
 class Firewall (EventMixin):
     def __init__(self):
         self . listenTo(core.openflow)
-        log. debug(" Enabling ␣ Firewall ␣ Module ")
+        log. debug(" Enabling Firewall Module ")
 
     def _handle_ConnectionUp(self, event):
         # Regla 1: no se pueden comunicar host 2 y 3
@@ -37,12 +37,14 @@ class Firewall (EventMixin):
         event.connection.send(flow_mod)'''
 
         # Regla 3: descartar paquetes con puerto 80
+        return
+
+    def _handle_PacketIn(self, event):
         blocked = of.ofp_match()
         blocked.tp_dst = 80
         flow_mod = of.ofp_flow_mod()
         flow_mod.match = blocked
         event.connection.send(flow_mod)
-
         '''
         packet = event.parsed
         if packet.type == packet.IP_TYPE:

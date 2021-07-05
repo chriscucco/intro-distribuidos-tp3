@@ -1,63 +1,125 @@
-from pox . core import core
-import pox . openflow . libopenflow_01 as of
-from pox . lib . revent import *
-from pox . lib . util import dpidToStr
-from pox . lib . addresses import EthAddr
-from collections import namedtuple
-import os
-# Add your imports here ...
-log = core . getLogger()
+from pox.core import core
+import pox.openflow.libopenflow_01 as of
+from pox.lib.revent import EventMixin
+from pox.lib.addresses import EthAddr
+import csv
 
-HOST_1 = '00:00:00:00:00:01'
-HOST_2 = '00:00:00:00:00:02'
-HOST_3 = '00:00:00:00:00:03'
+log = core.getLogger()
+
+LINK_PROTOCOL = 1
+SRCMAC = 2
+DSTMAC = 3
+NETWORK_PROTOCOL = 4
+SRCIP = 5
+DSTIP = 6
+TRANSPORT_PROTOCOL = 7
+SRCPORT = 8
+DSTPORT = 9
 
 
 class Firewall (EventMixin):
     def __init__(self):
-        self . listenTo(core.openflow)
-        log. debug(" Enabling Firewall Module ")
+        self.listenTo(core.openflow)
+        self.droppingRules = []
+        self._parseDroppingRules()
+        log.debug(" Enabling Firewall Module ")
 
-    def _handle_ConnectionUp(self, event):
-        # Regla 1: no se pueden comunicar host 2 y 3
-        blocked = of.ofp_match()
-        blocked.dl_src = EthAddr(HOST_2)
-        blocked.dl_dst = EthAddr(HOST_3)
-        flow_mod = of.ofp_flow_mod()
-        flow_mod.match = blocked
-        event.connection.send(flow_mod)
+    def _parseDroppingRules(self):
+        with open('dropping_rules.csv', 'r') as f:
+            reader = csv.reader(f)
+            i = 0
 
-        # Regla 2: descartar paquetes con UDP, puerto 5001 y con src en host1
-        '''blocked = of.ofp_match()
-        blocked.dl_src = EthAddr(HOST_1)
-        blocked.tp_dst = 5001
-        blocked.new_proto = 17
-        flow_mod = of.ofp_flow_mod()
-        flow_mod.match = blocked
-        event.connection.send(flow_mod)'''
+            for row in reader:
+                if i == 0:
+                    i += 1
+                    continue
 
-        # Regla 3: descartar paquetes con puerto 80
-        return
+                self.droppingRules.append([row[LINK_PROTOCOL], row[SRCMAC],
+                                          row[DSTMAC], row[NETWORK_PROTOCOL],
+                                          row[SRCIP], row[DSTIP],
+                                          row[TRANSPORT_PROTOCOL],
+                                          row[SRCPORT], row[DSTPORT]])
+                i += 1
+
+    def _checkRules(self, event):
+
+        drop = False
+
+        for rule in self.droppingRules:
+
+            packet = event.parsed
+
+            link_layer = packet.find(rule[LINK_PROTOCOL-1])
+
+            if not link_layer:
+                continue
+
+            if rule[SRCMAC-1] and str(link_layer.src) != str(rule[SRCMAC-1]):
+                continue
+
+            if rule[DSTMAC-1] and str(link_layer.dst) != str(rule[DSTMAC-1]):
+                continue
+
+            network_layer = packet.find(rule[NETWORK_PROTOCOL-1])
+
+            if not network_layer:
+                continue
+
+            if (rule[SRCIP-1] and str(network_layer.srcip) !=
+                    str(rule[SRCIP-1])):
+                continue
+
+            if (rule[DSTIP-1] and str(network_layer.dstip)
+                    != str(rule[DSTIP-1])):
+                continue
+
+            transport_layer = packet.find(rule[TRANSPORT_PROTOCOL-1])
+
+            if not transport_layer:
+                continue
+
+            if (rule[SRCPORT-1] and str(transport_layer.srcport) !=
+                    str(rule[SRCPORT-1])):
+                continue
+
+            if (rule[DSTPORT-1] and str(transport_layer.dstport) !=
+                    str(rule[DSTPORT-1])):
+                continue
+
+            drop = True
+            break
+
+        return drop
 
     def _handle_PacketIn(self, event):
-        blocked = of.ofp_match()
-        blocked.tp_dst = 80
-        flow_mod = of.ofp_flow_mod()
-        flow_mod.match = blocked
-        event.connection.send(flow_mod)
-        '''
-        packet = event.parsed
-        if packet.type == packet.IP_TYPE:
-            ip_packet = packet.payload
-            if ip_packet.protocol == ip_packet.17:
+        drop = self._checkRules(event)
+        if drop is True:
+            event.halt = True
 
-        packet.dst = 80
-        '''
+        return
 
+    def _blockHosts(self, event):
+        with open('blocking_rules.csv', 'r') as f:
+            reader = csv.reader(f)
+            i = 0
+
+            for row in reader:
+                if i == 0:
+                    i += 1
+                    continue
+                blocked = of.ofp_match()
+                blocked.dl_src = EthAddr(row[1])
+                blocked.dl_dst = EthAddr(row[2])
+                flow_mod = of.ofp_flow_mod()
+                flow_mod.match = blocked
+                event.connection.send(flow_mod)
+                i += 1
+
+    def _handle_ConnectionUp(self, event):
+        self._blockHosts(event)
         return
 
 
 def launch():
     # Starting the Firewall module
     core.registerNew(Firewall)
-    # core.openflow.addListenerByName("PacketIn", _handle_PacketIn)

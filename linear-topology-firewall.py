@@ -1,6 +1,7 @@
 from pox.core import core
 import pox.openflow.libopenflow_01 as of
 from pox.lib.revent import EventMixin
+from pox.lib.util import dpidToStr
 from pox.lib.addresses import EthAddr
 import csv
 
@@ -21,7 +22,9 @@ class Firewall (EventMixin):
     def __init__(self):
         self.listenTo(core.openflow)
         self.droppingRules = []
+        self.switchesWithRules = {}
         self._parseDroppingRules()
+        self._parseSwitchesWithRules()
         log.debug(" Enabling Firewall Module ")
 
     def _parseDroppingRules(self):
@@ -39,6 +42,19 @@ class Firewall (EventMixin):
                                           row[SRCIP], row[DSTIP],
                                           row[TRANSPORT_PROTOCOL],
                                           row[SRCPORT], row[DSTPORT]])
+                i += 1
+
+    def _parseSwitchesWithRules(self):
+        with open('switches_with_rules.csv', 'r') as f:
+            reader = csv.reader(f)
+            i = 0
+
+            for row in reader:
+                if i == 0:
+                    i += 1
+                    continue
+
+                self.switchesWithRules[int(row[0])] = row[0]
                 i += 1
 
     def _checkRules(self, event):
@@ -92,9 +108,10 @@ class Firewall (EventMixin):
         return drop
 
     def _handle_PacketIn(self, event):
-        drop = self._checkRules(event)
-        if drop is True:
-            event.halt = True
+        if event.dpid in self.switchesWithRules:
+            drop = self._checkRules(event)
+            if drop is True:
+                event.halt = True
 
         return
 
@@ -116,7 +133,8 @@ class Firewall (EventMixin):
                 i += 1
 
     def _handle_ConnectionUp(self, event):
-        self._blockHosts(event)
+        if event.dpid in self.switchesWithRules:
+            self._blockHosts(event)
         return
 
 

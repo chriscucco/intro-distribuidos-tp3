@@ -17,7 +17,7 @@ SRCPORT = 8
 DSTPORT = 9
 
 
-class Firewall (EventMixin):
+class Firewall(EventMixin):
     def __init__(self):
         self.listenTo(core.openflow)
         self.droppingRules = []
@@ -130,6 +130,13 @@ class Firewall (EventMixin):
                 blocked = of.ofp_match()
                 blocked.dl_src = EthAddr(row[1])
                 blocked.dl_dst = EthAddr(row[2])
+                flow_mod = of.ofp_flow_mod()
+                flow_mod.match = blocked
+                event.connection.send(flow_mod)
+                log.debug(str(row[1]) + " and " + str(row[2]) + " blocked.")
+                blocked = of.ofp_match()
+                blocked.dl_src = EthAddr(row[2])
+                blocked.dl_dst = EthAddr(row[1])
                 flow_mod = of.ofp_flow_mod()
                 flow_mod.match = blocked
                 event.connection.send(flow_mod)

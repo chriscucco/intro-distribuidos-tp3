@@ -118,6 +118,14 @@ class Firewall(EventMixin):
 
         return
 
+    def _sendBlockedMatch(self, src, dst, event):
+        blocked = of.ofp_match()
+        blocked.dl_src = EthAddr(src)
+        blocked.dl_dst = EthAddr(dst)
+        flow_mod = of.ofp_flow_mod()
+        flow_mod.match = blocked
+        event.connection.send(flow_mod)
+
     def _blockHosts(self, event):
         with open('blocking_rules.csv', 'r') as f:
             reader = csv.reader(f)
@@ -127,19 +135,9 @@ class Firewall(EventMixin):
                 if i == 0:
                     i += 1
                     continue
-                blocked = of.ofp_match()
-                blocked.dl_src = EthAddr(row[1])
-                blocked.dl_dst = EthAddr(row[2])
-                flow_mod = of.ofp_flow_mod()
-                flow_mod.match = blocked
-                event.connection.send(flow_mod)
-                log.debug(str(row[1]) + " and " + str(row[2]) + " blocked.")
-                blocked = of.ofp_match()
-                blocked.dl_src = EthAddr(row[2])
-                blocked.dl_dst = EthAddr(row[1])
-                flow_mod = of.ofp_flow_mod()
-                flow_mod.match = blocked
-                event.connection.send(flow_mod)
+                self._sendBlockedMatch(row[1], row[2], event)
+                self._sendBlockedMatch(row[2], row[1], event)
+
                 log.debug(str(row[1]) + " and " + str(row[2]) + " blocked.")
                 i += 1
 

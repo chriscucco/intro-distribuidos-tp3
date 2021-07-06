@@ -2,7 +2,6 @@ from pox.core import core
 import pox.openflow.libopenflow_01 as of
 from pox.lib.revent import EventMixin
 from pox.lib.addresses import EthAddr
-from lib.logger.logger import Logger
 import csv
 
 log = core.getLogger()

@@ -1,8 +1,8 @@
 from pox.core import core
 import pox.openflow.libopenflow_01 as of
 from pox.lib.revent import EventMixin
-from pox.lib.util import dpidToStr
 from pox.lib.addresses import EthAddr
+from lib.logger.logger import Logger
 import csv
 
 log = core.getLogger()
@@ -25,7 +25,7 @@ class Firewall (EventMixin):
         self.switchesWithRules = {}
         self._parseDroppingRules()
         self._parseSwitchesWithRules()
-        log.debug(" Enabling Firewall Module ")
+        log.debug("Enabling Firewall Module ")
 
     def _parseDroppingRules(self):
         with open('dropping_rules.csv', 'r') as f:
@@ -103,6 +103,10 @@ class Firewall (EventMixin):
                 continue
 
             drop = True
+            log.debug("Packet dropped with data:")
+            log.debug("**" + str(link_layer))
+            log.debug("**" + str(network_layer))
+            log.debug("**" + str(transport_layer))
             break
 
         return drop
@@ -130,6 +134,7 @@ class Firewall (EventMixin):
                 flow_mod = of.ofp_flow_mod()
                 flow_mod.match = blocked
                 event.connection.send(flow_mod)
+                log.debug(str(row[1]) + " and " + str(row[2]) + " blocked.")
                 i += 1
 
     def _handle_ConnectionUp(self, event):

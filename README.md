@@ -20,6 +20,16 @@ sudo pox/pox.py samples.spanning_tree forwarding.l2_learning
 ## Firewall usage
 
 The files to receive blocking and dropping rules, and the file to receive the switches where aply that rules, must be named blocking_rules.csv, dropping_rules.csv and switches_with_rules.csv respectively. This files must be dropped on pox folder (inside mininet VM enter: cd pox), against linear-topology-firewall.py.
+The repository has one example for each .csv file. Notice that to aply a rule with more than one transport layer protocol, the line with the rul must be repeated as many times as protocols are to be applied. For example, if we want packets with destiny port 80 to be dropped, with tcp and udp, we must write on the .csv file:
+
+id	linkProtocol	srcMac	dstMac	networkProtocol	srcIp	dstIp	transportProtocol	srcPort	  dstPort
+1	ethernet			ipv4			tcp		80
+2	ethernet			ipv4			udp		80
+
+
+
+
+
 To run pox use the following command:
 ./pox.py forwarding.l2_learning linear-topology-firewall
 

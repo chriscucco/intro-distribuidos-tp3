@@ -1,4 +1,5 @@
 id,linkProtocol,srcMac,dstMac,networkProtocol,srcIp,dstIp,transportProtocol,srcPort,dstPort
 1,ethernet,,,ipv4,,,tcp,,80
-2,ethernet,00:00:00:00:00:01,,ipv4,,,udp,,5001
-3,ethernet,,,ipv4,10.0.0.4,,tcp,,90
+2,ethernet,,,ipv4,,,udp,,80
+3,ethernet,00:00:00:00:00:01,,ipv4,,,udp,,5001
+4,ethernet,,,ipv4,10.0.0.4,,tcp,,90

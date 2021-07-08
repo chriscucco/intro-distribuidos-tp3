@@ -6,6 +6,7 @@ import csv
 
 log = core.getLogger()
 
+
 LINK_PROTOCOL = 1
 SRCMAC = 2
 DSTMAC = 3
@@ -22,6 +23,7 @@ class Firewall(EventMixin):
         self.listenTo(core.openflow)
         self.droppingRules = []
         self.switchesWithRules = {}
+        self.nextDpid = 1
         self._parseDroppingRules()
         self._parseSwitchesWithRules()
         log.debug("Enabling Firewall Module ")
@@ -142,6 +144,9 @@ class Firewall(EventMixin):
                 i += 1
 
     def _handle_ConnectionUp(self, event):
+        event.dpid = self.nextDpid
+        self.nextDpid += 1
+
         if event.dpid in self.switchesWithRules:
             self._blockHosts(event)
         return
